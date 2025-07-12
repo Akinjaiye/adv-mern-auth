@@ -1,8 +1,13 @@
 import bcrypt from "bcryptjs";
-import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import nodemailer from "nodemailer"
 import { User } from "../models/userModel.js";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";  
+import { sendWelcomeEmail } from '../nodemailer/email.js';
+
+
+
+
 
 dotenv.config();
 
@@ -59,11 +64,7 @@ export const signup = async (req, res) => {
 
     await newUser.save();
 
-    await sendEmail(
-      newUser.email,
-      'Welcome to Our App!',
-      `Hi ${newUser.name}, your verification code is: ${verificationToken}`
-    );
+    await sendWelcomeEmail(email, name, verificationToken);
 
     generateTokenAndSetCookie(res, newUser._id);
 
@@ -81,6 +82,46 @@ export const signup = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const verifyEmail = async (req, res) => {
+  const { email, token } = req.body;
+
+  if (!email || !token) {
+    return res.status(400).json({ success: false, message: "Email and token are required" });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ success: false, message: "Email already verified" });
+    }
+
+    if (
+      user.verificationToken !== token ||
+      user.verificationTokenExpiresAt < Date.now()
+    ) {
+      return res.status(400).json({ success: false, message: "Invalid or expired token" });
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpiresAt = undefined;
+    await user.save();
+
+    res.status(200).json({ success: true, message: "Email verified successfully" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+
 
 
 export const login = async (req, res) => {
