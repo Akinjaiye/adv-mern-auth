@@ -1,12 +1,11 @@
 import bcrypt from "bcryptjs";
 import dotenv from 'dotenv';
 import nodemailer from "nodemailer"
+import crypto from 'crypto';
+
 import { User } from "../models/userModel.js";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";  
-import { sendWelcomeEmail } from '../nodemailer/email.js';
-
-
-
+import { sendWelcomeEmail, sendForgotPasswordEmail, sendResetConfirmationEmail } from '../nodemailer/email.js';
 
 
 dotenv.config();
@@ -123,7 +122,6 @@ export const verifyEmail = async (req, res) => {
 
 
 
-
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -161,6 +159,84 @@ export const login = async (req, res) => {
   res.status(500).json({ success: false, message: error.message });
 }
 };
+
+
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  try {
+    if (!email) throw new Error("Email is required");
+
+    const user = await User.findOne({ email });
+    if (!user) throw new Error("User not found");
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpiresAt = Date.now() + 15 * 60 * 1000; // 15 min
+    await user.save();
+
+    await sendForgotPasswordEmail(user.email, user.name, resetToken);
+
+    res.status(200).json({ success: true, message: 'Reset email sent' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+  try {
+    if (!token || !newPassword) throw new Error("Token and new password are required");
+
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpiresAt: { $gt: Date.now() },
+    });
+
+    if (!user) throw new Error("Token is invalid or expired");
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpiresAt = undefined;
+    await user.save();
+
+    await sendResetConfirmationEmail(user.email, user.name);
+
+    res.status(200).json({ success: true, message: "Password reset successful" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+export const checkAuth = async (req, res) => {
+  try {
+    // `req.user` is set by the verifyToken middleware
+    const userId = req.user.userId;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const user = await User.findById(userId).select("-password"); // exclude password
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "User is authenticated",
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 
 export const logout = async (req, res) => {
   try {

@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
-import { welcomeEmailTemplate } from './emailTemplate.js';
+import { forgotPasswordTemplate, passwordResetConfirmationTemplate, welcomeEmailTemplate } from './emailTemplate.js';
 
 dotenv.config();
 
@@ -28,4 +28,23 @@ export const sendWelcomeEmail = async (to, name, verificationCode) => {
     console.error('❌ Error sending email:', error);
     throw error;
   }
+};
+
+
+export const sendForgotPasswordEmail = async (to, name, token) => {
+  await transporter.sendMail({
+    from: `"Your App Name" <${process.env.EMAIL_USER}>`,
+    to,
+    subject: 'Reset Your Password',
+    html: forgotPasswordTemplate(name, token),
+  });
+};
+
+export const sendResetConfirmationEmail = async (to, name) => {
+  await transporter.sendMail({
+    from: `"Your App Name" <${process.env.EMAIL_USER}>`,
+    to,
+    subject: 'Password Reset Successful',
+    html: passwordResetConfirmationTemplate(name),
+  });
 };
