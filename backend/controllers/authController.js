@@ -122,6 +122,7 @@ export const verifyEmail = async (req, res) => {
 
 
 
+
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -142,6 +143,10 @@ export const login = async (req, res) => {
 
     existingUser.lastLogin = Date.now();
     await existingUser.save();
+
+    if (!existingUser.isVerified) {
+  return res.status(403).json({ success: false, message: "Please verify your email first." });
+}
 
     generateTokenAndSetCookie(res, existingUser._id);
 

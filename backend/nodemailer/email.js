@@ -17,7 +17,7 @@ export const sendWelcomeEmail = async (to, name, verificationCode) => {
     from: process.env.EMAIL_USER,
     to,
     subject: 'Welcome to Our App!',
-    html: welcomeEmailTemplate(name, verificationCode),  // HTML instead of text
+    html: welcomeEmailTemplate(name, verificationCode, to),
   };
 
   try {
@@ -29,6 +29,7 @@ export const sendWelcomeEmail = async (to, name, verificationCode) => {
     throw error;
   }
 };
+
 
 
 export const sendForgotPasswordEmail = async (to, name, token) => {

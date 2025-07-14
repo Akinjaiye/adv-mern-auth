@@ -1,15 +1,19 @@
-export const welcomeEmailTemplate = (name, verificationCode) => {
+export const welcomeEmailTemplate = (name, token, email) => {
+  const verificationLink = `http://localhost:5173/verify-email?email=${email}&token=${token}`;
+
   return `
     <div style="font-family: Arial, sans-serif; padding: 20px;">
-      <h2 style="color: #4CAF50;">Welcome, ${name}!</h2>
-      <p>Thank you for signing up. Your verification code is:</p>
-      <p style="font-size: 24px; font-weight: bold;">${verificationCode}</p>
-      <p>This code is valid for 24 hours. Please do not share this code with anyone.</p>
+      <h2>Welcome to Our App, ${name}!</h2>
+      <p>Thank you for registering. Please verify your email by clicking the link below:</p>
+      <a href="${verificationLink}" style="display: inline-block; padding: 10px 20px; background-color: #4f46e5; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>
+      <p>If the button doesn't work, copy and paste this link into your browser:</p>
+      <p>${verificationLink}</p>
       <br/>
-      <p style="font-size: 12px; color: #888;">If you did not request this, you can ignore this email.</p>
+      <p>Cheers,<br/>The Team</p>
     </div>
   `;
 };
+
 
 export const forgotPasswordTemplate = (name, token) => {
   const resetLink = `https://yourfrontend.com/reset-password?token=${token}`; // Replace with your frontend URL
