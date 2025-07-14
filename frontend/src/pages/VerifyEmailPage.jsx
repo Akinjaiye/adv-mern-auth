@@ -5,7 +5,7 @@ export default function VerifyEmailPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState("Verifying your email...");
-  const [success, setSuccess] = useState(null); // null = loading, true/false = result
+  const [success, setSuccess] = useState(null); 
 
   useEffect(() => {
     const email = searchParams.get("email");

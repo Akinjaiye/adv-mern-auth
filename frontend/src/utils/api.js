@@ -19,11 +19,11 @@ export async function loginUser(data) {
   return responseData;
 }
 
-// ✅ ADD THIS FUNCTION
+
 export async function signupUser(data) {
   const res = await fetch(`${BASE_URL}/signup`, {
     method: "POST",
-    credentials: "include", // 🔥 include cookies
+    credentials: "include", 
     headers: {
       "Content-Type": "application/json",
     },

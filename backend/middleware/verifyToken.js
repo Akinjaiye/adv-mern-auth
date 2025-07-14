@@ -4,10 +4,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const verifyToken = (req, res, next) => {
-  console.log("👉 Incoming cookies:", req.cookies); // ✅ Log all cookies
+  console.log("👉 Incoming cookies:", req.cookies); 
 
   const token = req.cookies?.jwt;
-  console.log("👉 Extracted token:", token); // ✅ Log the JWT
+  console.log("👉 Extracted token:", token); 
 
   if (!token) {
     return res.status(401).json({ success: false, message: 'Access denied. No token provided.' });
@@ -15,7 +15,7 @@ export const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("✅ Token decoded:", decoded); // ✅ See decoded userId
+    console.log("✅ Token decoded:", decoded); 
 
     req.user = decoded;
     next();

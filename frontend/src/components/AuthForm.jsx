@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 
-// components/AuthForm.jsx
+
 
 export default function AuthForm({
   heading,
@@ -51,7 +51,6 @@ export default function AuthForm({
         </button>
       </form>
 
-      {/* Forgot password link if provided */}
       {extraLink && <div className="mt-2 text-right">{extraLink}</div>}
 
       <div className="mt-4 text-sm text-center text-gray-600">

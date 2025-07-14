@@ -19,7 +19,7 @@ export default function App() {
 
   useEffect(() => {
   const fetchUser = async () => {
-    const token = localStorage.getItem("authToken"); // optional
+    const token = localStorage.getItem("authToken"); 
     if (!token) {
       setUser(null);
       setLoading(false);
@@ -28,7 +28,7 @@ export default function App() {
 
     try {
       const res = await fetch("http://localhost:3000/api/auth/check-auth", {
-        credentials: "include", // ✅ very important
+        credentials: "include", 
         headers: {
           "Content-Type": "application/json",
         },
@@ -70,7 +70,7 @@ export default function App() {
 return (
   <>
     <Routes>
-      {/* Public Routes */}
+      
       <Route
         path="/"
         element={
@@ -97,7 +97,7 @@ return (
       />
       <Route path="/verify-email" element={<VerifyEmailPage />} />
 
-      {/* Protected Route */}
+      
       <Route
         path="/home"
         element={
