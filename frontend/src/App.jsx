@@ -5,6 +5,8 @@ import SignUpPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
 import Home from "./pages/Home";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
@@ -65,7 +67,8 @@ export default function App() {
     );
   }
 
-  return (
+return (
+  <>
     <Routes>
       {/* Public Routes */}
       <Route
@@ -105,9 +108,11 @@ export default function App() {
       />
 
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
     </Routes>
 
-  );
+    <ToastContainer position="top-center" autoClose={3000} />
+  </>
+);
+
 }

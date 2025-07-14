@@ -40,6 +40,25 @@ export const sendEmail = async (to, subject, text) => {
 
 export const signup = async (req, res) => {
   const { email, password, name } = req.body;
+    // Password strength validation
+  const isStrongPassword = (password) => {
+    return (
+      password.length >= 8 &&
+      /[a-z]/.test(password) &&
+      /[A-Z]/.test(password) &&
+      /\d/.test(password) &&
+      /[!@#$%^&*]/.test(password)
+    );
+  };
+
+  if (!isStrongPassword(password)) {
+    return res.status(400).json({
+      success: false,
+      message:
+        "Password must be at least 8 characters and include uppercase, lowercase, number, and symbol.",
+    });
+  }
+
   try {
     if (!email || !password || !name) {
       throw new Error("All fields are required");
@@ -192,6 +211,24 @@ export const forgotPassword = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
   const { token, newPassword } = req.body;
+  const isStrongPassword = (password) => {
+  return (
+    password.length >= 8 &&
+    /[a-z]/.test(password) &&
+    /[A-Z]/.test(password) &&
+    /\d/.test(password) &&
+    /[!@#$%^&*]/.test(password)
+  );
+};
+
+if (!isStrongPassword(newPassword)) {
+  return res.status(400).json({
+    success: false,
+    message:
+      "Password must be at least 8 characters and include uppercase, lowercase, number, and symbol.",
+  });
+}
+
   try {
     if (!token || !newPassword) throw new Error("Token and new password are required");
 
