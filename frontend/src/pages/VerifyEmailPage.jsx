@@ -5,14 +5,15 @@ export default function VerifyEmailPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState("Verifying your email...");
-  const [success, setSuccess] = useState(false);
+  const [success, setSuccess] = useState(null); // null = loading, true/false = result
 
   useEffect(() => {
     const email = searchParams.get("email");
     const token = searchParams.get("token");
 
     if (!email || !token) {
-      setStatus("Invalid verification link.");
+      setStatus("❌ Invalid verification link.");
+      setSuccess(false);
       return;
     }
 
@@ -32,9 +33,11 @@ export default function VerifyEmailPage() {
           setTimeout(() => navigate("/login"), 3000);
         } else {
           setStatus(`❌ ${data.message || "Verification failed."}`);
+          setSuccess(false);
         }
       } catch (err) {
-        setStatus("❌ Server error. Please try again.", err.message);
+        setStatus(`❌ Server error: ${err.message}`);
+        setSuccess(false);
       }
     };
 
@@ -42,11 +45,50 @@ export default function VerifyEmailPage() {
   }, [navigate, searchParams]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md text-center max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-4">Email Verification</h2>
-        <p className={`text-lg ${success ? "text-green-600" : "text-red-600"}`}>
-          {status}
+    <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-white flex items-center justify-center px-4">
+      <div className="bg-white shadow-2xl rounded-2xl p-8 max-w-md w-full text-center">
+        <h2 className="text-3xl font-bold text-indigo-600 mb-4">
+          Email Verification
+        </h2>
+
+        {success === null && (
+          <div className="flex items-center justify-center gap-2 text-gray-500 mb-3">
+            <svg
+              className="animate-spin h-6 w-6 text-indigo-500"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              ></path>
+            </svg>
+            <p>Verifying your token...</p>
+          </div>
+        )}
+
+        {success !== null && (
+          <p
+            className={`text-lg font-medium ${
+              success ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {status}
+          </p>
+        )}
+
+        <p className="text-sm text-gray-500 mt-4">
+          You will be redirected to the login page shortly.
         </p>
       </div>
     </div>

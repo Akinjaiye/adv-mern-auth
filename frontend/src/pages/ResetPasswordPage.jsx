@@ -20,20 +20,6 @@ export default function ResetPasswordPage() {
     }
   }, [searchParams]);
 
-  const handlePasswordChange = (e) => {
-    setNewPassword(e.target.value);
-  };
-
-  const isStrongPassword = () => {
-    return (
-      newPassword.length >= 8 &&
-      /[a-z]/.test(newPassword) &&
-      /[A-Z]/.test(newPassword) &&
-      /\d/.test(newPassword) &&
-      /[!@#$%^&*]/.test(newPassword)
-    );
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -41,15 +27,16 @@ export default function ResetPasswordPage() {
       return toast.error("Passwords do not match");
     }
 
-    if (!isStrongPassword()) {
-      return toast.error("Password does not meet requirements");
+    if (!isStrongPassword(newPassword)) {
+      return toast.error("Password does not meet security requirements");
     }
 
     try {
-      const res = await axios.post("/api/auth/reset-password", {
+      const res = await axios.post("http://localhost:3000/api/auth/reset-password", {
         token,
         newPassword,
       });
+
       toast.success(res.data.message || "Password reset successful");
       setTimeout(() => navigate("/login"), 3000);
     } catch (err) {
@@ -57,81 +44,74 @@ export default function ResetPasswordPage() {
     }
   };
 
-  const passwordChecklist = [
-    {
-      label: "At least 8 characters",
-      valid: newPassword.length >= 8,
-    },
-    {
-      label: "At least one lowercase letter",
-      valid: /[a-z]/.test(newPassword),
-    },
-    {
-      label: "At least one uppercase letter",
-      valid: /[A-Z]/.test(newPassword),
-    },
-    {
-      label: "At least one number",
-      valid: /\d/.test(newPassword),
-    },
-    {
-      label: "At least one symbol (!@#$%)",
-      valid: /[!@#$%^&*]/.test(newPassword),
-    },
-  ];
+  const isStrongPassword = (password) =>
+    password.length >= 8 &&
+    /[a-z]/.test(password) &&
+    /[A-Z]/.test(password) &&
+    /\d/.test(password) &&
+    /[!@#$%^&*]/.test(password);
 
   return (
-    <div className="max-w-md mx-auto p-4">
-      <h2 className="text-xl font-bold mb-4">Reset Your Password</h2>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-white flex items-center justify-center px-4">
+      <div className="bg-white shadow-2xl rounded-2xl p-8 max-w-md w-full">
+        <h2 className="text-2xl font-bold text-indigo-600 mb-4 text-center">
+          Reset Password
+        </h2>
+        <form onSubmit={handleSubmit}>
+          <div className="relative mb-4">
+            <input
+              type={showPassword ? "text" : "password"}
+              className="w-full border p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="New Password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-3 text-sm text-indigo-500"
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="relative mb-2">
+          <ul className="text-sm mb-3 space-y-1 text-left pl-2">
+            {[
+              { label: "At least 8 characters", valid: newPassword.length >= 8 },
+              { label: "One lowercase letter", valid: /[a-z]/.test(newPassword) },
+              { label: "One uppercase letter", valid: /[A-Z]/.test(newPassword) },
+              { label: "One number", valid: /\d/.test(newPassword) },
+              { label: "One symbol (!@#$%^&*)", valid: /[!@#$%^&*]/.test(newPassword) },
+            ].map((rule, i) => (
+              <li
+                key={i}
+                className={`flex gap-2 items-center ${
+                  rule.valid ? "text-green-600" : "text-red-500"
+                }`}
+              >
+                {rule.valid ? "✅" : "❌"} {rule.label}
+              </li>
+            ))}
+          </ul>
+
           <input
             type={showPassword ? "text" : "password"}
-            className="w-full border p-2"
-            placeholder="Enter new password"
-            value={newPassword}
-            onChange={handlePasswordChange}
+            className="w-full border p-3 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="Confirm New Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
+
           <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-2 top-2 text-sm text-blue-500"
+            type="submit"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-md font-semibold transition"
           >
-            {showPassword ? "Hide" : "Show"}
+            Reset Password
           </button>
-        </div>
-
-        <ul className="text-sm mb-3 space-y-1">
-          {passwordChecklist.map((rule, index) => (
-            <li
-              key={index}
-              className={`flex items-center gap-2 ${
-                rule.valid ? "text-green-600" : "text-red-500"
-              }`}
-            >
-              <span>{rule.valid ? "✅" : "❌"}</span> {rule.label}
-            </li>
-          ))}
-        </ul>
-
-        <input
-          type={showPassword ? "text" : "password"}
-          className="w-full border p-2 mb-2"
-          placeholder="Confirm new password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
-        />
-
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded"
-        >
-          Reset Password
-        </button>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

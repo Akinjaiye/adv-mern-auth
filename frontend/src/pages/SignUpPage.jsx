@@ -13,47 +13,29 @@ export default function SignUpPage() {
   const navigate = useNavigate();
 
   const passwordChecklist = [
-    {
-      label: "At least 8 characters",
-      valid: newPassword.length >= 8,
-    },
-    {
-      label: "At least one lowercase letter",
-      valid: /[a-z]/.test(newPassword),
-    },
-    {
-      label: "At least one uppercase letter",
-      valid: /[A-Z]/.test(newPassword),
-    },
-    {
-      label: "At least one number",
-      valid: /\d/.test(newPassword),
-    },
-    {
-      label: "At least one symbol (!@#$%)",
-      valid: /[!@#$%^&*]/.test(newPassword),
-    },
+    { label: "At least 8 characters", valid: newPassword.length >= 8 },
+    { label: "At least one lowercase letter", valid: /[a-z]/.test(newPassword) },
+    { label: "At least one uppercase letter", valid: /[A-Z]/.test(newPassword) },
+    { label: "At least one number", valid: /\d/.test(newPassword) },
+    { label: "At least one symbol (!@#$%)", valid: /[!@#$%^&*]/.test(newPassword) },
   ];
 
-  const isStrongPassword = () => passwordChecklist.every((rule) => rule.valid);
+  const isStrongPassword = () => passwordChecklist.every(rule => rule.valid);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!name || !email || !newPassword || !confirmPassword) {
       return toast.error("All fields are required");
     }
-
     if (newPassword !== confirmPassword) {
       return toast.error("Passwords do not match");
     }
-
     if (!isStrongPassword()) {
       return toast.error("Password is too weak");
     }
 
     try {
-      const res = await axios.post("/api/auth/signup", {
+      const res = await axios.post("http://localhost:3000/api/auth/signup", {
         name,
         email,
         password: newPassword,
@@ -67,75 +49,67 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4">
-      <h2 className="text-xl font-bold mb-4">Create an Account</h2>
-
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          className="w-full border p-2 mb-2"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-
-        <input
-          type="email"
-          className="w-full border p-2 mb-2"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-
-        <div className="relative mb-2">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 to-white">
+      <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md">
+        <h2 className="text-3xl font-bold text-indigo-600 mb-6 text-center">Create an Account</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-3 text-indigo-600 text-sm"
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
+          <ul className="text-sm space-y-1">
+            {passwordChecklist.map((rule, i) => (
+              <li
+                key={i}
+                className={`flex items-center gap-2 ${
+                  rule.valid ? "text-green-600" : "text-red-500"
+                }`}
+              >
+                <span>{rule.valid ? "✅" : "❌"}</span> {rule.label}
+              </li>
+            ))}
+          </ul>
           <input
             type={showPassword ? "text" : "password"}
-            className="w-full border p-2"
-            placeholder="Password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
           />
           <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-2 top-2 text-sm text-blue-500"
+            type="submit"
+            className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition"
           >
-            {showPassword ? "Hide" : "Show"}
+            Sign Up
           </button>
-        </div>
-
-        <ul className="text-sm mb-3 space-y-1">
-          {passwordChecklist.map((rule, index) => (
-            <li
-              key={index}
-              className={`flex items-center gap-2 ${
-                rule.valid ? "text-green-600" : "text-red-500"
-              }`}
-            >
-              <span>{rule.valid ? "✅" : "❌"}</span> {rule.label}
-            </li>
-          ))}
-        </ul>
-
-        <input
-          type={showPassword ? "text" : "password"}
-          className="w-full border p-2 mb-2"
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
-        />
-
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded"
-        >
-          Sign Up
-        </button>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }
