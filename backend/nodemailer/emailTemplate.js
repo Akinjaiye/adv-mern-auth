@@ -16,7 +16,7 @@ export const welcomeEmailTemplate = (name, token, email) => {
 
 
 export const forgotPasswordTemplate = (name, token) => {
-  const resetLink = `https://yourfrontend.com/reset-password?token=${token}`; // Replace with your frontend URL
+const resetLink = `http://localhost:5173/reset-password?token=${token}`;
 
   return `
     <div style="font-family: Arial, sans-serif; padding: 20px;">

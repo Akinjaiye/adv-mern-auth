@@ -1,10 +1,19 @@
-export default function Home({ setUser, user }) {
+import LogoutButton from "../components/LogoutButton";
+
+export default function Home({ user, setUser }) {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-blue-50 gap-4">
-      <h1 className="text-3xl font-bold text-blue-800">
-        Welcome, {user?.name || "Guest"}!
+    <div className="p-8 max-w-xl mx-auto">
+      <h1 className="text-3xl font-bold mb-4 text-center">
+        Welcome, {user?.name}!
       </h1>
-      <LogoutButton setUser={setUser} />
+
+      <p className="text-center text-gray-700 mb-4">
+        Email: {user?.email}
+      </p>
+
+      <div className="text-center mt-6">
+        <LogoutButton setUser={setUser} />
+      </div>
     </div>
   );
 }

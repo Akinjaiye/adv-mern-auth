@@ -157,6 +157,7 @@ export const login = async (req, res) => {
         id: existingUser._id,
         email: existingUser.email,
         name: existingUser.name,
+        isVerified: existingUser.isVerified,
       },
     });
 
